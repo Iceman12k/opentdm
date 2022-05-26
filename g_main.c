@@ -221,6 +221,25 @@ DLL_EXPORT game_export_t *GetGameAPI (game_import_t *import)
 
 	globals.edict_size = sizeof(edict_t);
 
+#ifdef ENHANCED_SERVER
+	G_InitExtEntrypoints();
+	globals.FetchGameExtension = G_FetchGameExtension;
+
+	engine_Client_GetProtocol = gi.CheckForExtension("Client_GetProtocol");
+	engine_Client_GetVersion = gi.CheckForExtension("Client_GetVersion");
+
+	engine_Ghud_SendUpdates = gi.CheckForExtension("Ghud_SendUpdates");
+	engine_Ghud_NewElement = gi.CheckForExtension("Ghud_NewElement");
+	engine_Ghud_SetFlags = gi.CheckForExtension("Ghud_SetFlags");
+	engine_Ghud_UnicastSetFlags = gi.CheckForExtension("Ghud_UnicastSetFlags");
+	engine_Ghud_SetInt = gi.CheckForExtension("Ghud_SetInt");
+	engine_Ghud_SetText = gi.CheckForExtension("Ghud_SetText");
+	engine_Ghud_SetPosition = gi.CheckForExtension("Ghud_SetPosition");
+	engine_Ghud_SetAnchor = gi.CheckForExtension("Ghud_SetAnchor");
+	engine_Ghud_SetColor = gi.CheckForExtension("Ghud_SetColor");
+	engine_Ghud_SetSize = gi.CheckForExtension("Ghud_SetSize");
+#endif
+
 	return &globals;
 }
 

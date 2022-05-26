@@ -811,6 +811,40 @@ extern cvar_t   *sv_mvd_enable;
 
 #define world   (&g_edicts[0])
 
+
+#ifdef ENHANCED_SERVER
+int(*engine_Client_GetVersion)(edict_t *ent);
+int(*engine_Client_GetProtocol)(edict_t *ent);
+int Client_GetVersion(edict_t *ent);
+int Client_GetProtocol(edict_t *ent);
+
+void(*engine_Ghud_SendUpdates)(edict_t *ent);
+void  Ghud_SendUpdates(edict_t *ent);
+int(*engine_Ghud_NewElement)(int type);
+int   Ghud_NewElement(int type);
+void(*engine_Ghud_SetFlags)(int i, int val);
+void  Ghud_SetFlags(int i, int val);
+void(*engine_Ghud_UnicastSetFlags)(edict_t *ent, int i, int val);
+void  Ghud_UnicastSetFlags(edict_t *ent, int i, int val);
+void(*engine_Ghud_SetInt)(int i, int val);
+void  Ghud_SetInt(int i, int val);
+void(*engine_Ghud_SetText)(int i, char *text);
+void  Ghud_SetText(int i, char *text);
+void(*engine_Ghud_SetPosition)(int i, int x, int y);
+void  Ghud_SetPosition(int i, int x, int y);
+void(*engine_Ghud_SetAnchor)(int i, float x, float y);
+void  Ghud_SetAnchor(int i, float x, float y);
+void(*engine_Ghud_SetColor)(int i, int r, int g, int b, int a);
+void  Ghud_SetColor(int i, int r, int g, int b, int a);
+void(*engine_Ghud_SetSize)(int i, int x, int y);
+void  Ghud_SetSize(int i, int x, int y);
+
+int   Ghud_AddIcon(int x, int y, int image, int sizex, int sizey);
+int   Ghud_AddText(int x, int y, char *text);
+int   Ghud_AddNumber(int x, int y, int value);
+#endif
+
+
 // item spawnflags
 #define ITEM_TRIGGER_SPAWN      0x00000001
 #define ITEM_NO_TOUCH           0x00000002
@@ -1045,6 +1079,14 @@ void GetChaseTarget(edict_t *ent);
 void DisableChaseCam (edict_t *ent);
 void NextChaseMode (edict_t *ent);
 void SetChase (edict_t *ent, edict_t *target);
+
+//
+// g_ext.c
+//
+#ifdef ENHANCED_SERVER
+void G_InitExtEntrypoints(void);
+void* G_FetchGameExtension(char *name);
+#endif
 
 //opentdm
 
@@ -1631,6 +1673,9 @@ struct gclient_s
 
 	int            last_hud_update;
 	int            next_hud_update;
+
+	usercmd_t      cmd_last;
+	int            dimension_observe;
 };
 
 typedef enum
@@ -1783,6 +1828,8 @@ struct edict_s
 
 	// hack for proper s.old_origin updates
 	vec3_t      old_origin;
+
+	int			dimension_visible;
 };
 
 //server features

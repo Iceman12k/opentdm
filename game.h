@@ -222,6 +222,11 @@ typedef struct
 	void	(EXPORT *AddCommandString) (const char *text);
 
 	void	(EXPORT *DebugGraph) (float value, int color);
+
+#ifdef ENHANCED_SERVER
+	void *(*CheckForExtension)(char *text);
+#endif
+
 } game_import_t;
 
 //
@@ -266,6 +271,10 @@ typedef struct
 	// The game can issue gi.argc() / gi.argv() commands to get the rest
 	// of the parameters
 	void		(IMPORT *ServerCommand) (void);
+
+#ifdef ENHANCED_SERVER
+	void* (*FetchGameExtension)(char *name);
+#endif
 
 	//
 	// global variables shared between game and server

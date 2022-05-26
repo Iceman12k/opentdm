@@ -46,7 +46,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 #endif
 
-//#define ENHANCED_SERVER 1
+#define ENHANCED_SERVER
 
 // q_shared.h -- included first by ALL program modules
 
@@ -142,6 +142,10 @@ typedef __int64 int64;
 typedef unsigned __int32 uint32;
 typedef unsigned __int16 uint16;
 typedef unsigned __int64 uint64;
+typedef unsigned __int8	 uint8_t;
+typedef unsigned __int32 uint32_t;
+typedef unsigned __int16 uint16_t;
+typedef unsigned __int64 uint64_t;
 #else /* NON-WIN32 */
 #include <stdint.h>
 #define WINAPI
@@ -780,6 +784,11 @@ typedef struct
 	int16		gravity;
 	int16		delta_angles[3];	// add to command angles to get view direction
 									// changed by spawns, rotating objects, and teleporters
+#ifdef ENHANCED_SERVER
+	short			pm_aq2_flags;
+	unsigned short	pm_timestamp;
+	byte			pm_aq2_leghits;
+#endif
 } pmove_state_t;
 
 
