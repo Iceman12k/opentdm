@@ -50,6 +50,7 @@ trace_t XERP_trace(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end)
 	return gi.trace(start, mins, maxs, end, xerp_ent, MASK_PLAYERSOLID);
 }
 
+
 int G_customizeentityforclient(edict_t *client, edict_t *ent, entity_state_t *state)
 {
 	// first check visibility masks
@@ -60,10 +61,6 @@ int G_customizeentityforclient(edict_t *client, edict_t *ent, entity_state_t *st
 	{
 		//if (sv_antilag_interp->value) // don't extrapolate when our antilag accounts for lerp
 		//	return true;
-
-		float xerp_amount = 0;// FRAMETIME;
-		//if (!sv_antilag->value) // we don't add extra xerp with antilag
-			xerp_amount += (float)client->client->ping / 1000.0f;
 
 		pmove_t pm;
 		xerp_ent = ent;
@@ -85,7 +82,7 @@ int G_customizeentityforclient(edict_t *client, edict_t *ent, entity_state_t *st
 			pm.cmd.forwardmove = 0;
 		}
 
-		pm.cmd.msec = xerp_amount * 1000;
+		pm.cmd.msec = client->client->xerp_amount * 1000;
 
 		gi.Pmove(&pm);
 
@@ -95,17 +92,25 @@ int G_customizeentityforclient(edict_t *client, edict_t *ent, entity_state_t *st
 	{
 		if (ent->movetype)
 		{
+			float xerp_amount = macromax(FRAMETIME * 0.66, client->client->xerp_amount);
+
 			vec3_t start, end, velocity;
 			VectorCopy(state->origin, start);
 			VectorCopy(ent->velocity, velocity);
+
+			if (ent->owner == client) // we want our rockets as true as possible to the hitting position
+				VectorMA(state->old_origin, xerp_amount, velocity, state->old_origin);
+			else // other projectiles, make a bit smoother so they don't seem to teleport into existence
+				LerpVector(state->old_origin, state->origin, 0.33, state->old_origin);
 
 			switch (ent->movetype)
 			{
 			case MOVETYPE_BOUNCE:
 			case MOVETYPE_TOSS:
-				velocity[2] -= ent->gravity * sv_gravity->value * FRAMETIME;
+				velocity[2] -= ent->gravity * sv_gravity->value * xerp_amount;
+			case MOVETYPE_FLYMISSILE:
 			case MOVETYPE_FLY:
-				VectorMA(start, FRAMETIME, velocity, end);
+				VectorMA(start, xerp_amount, velocity, end);
 				break;
 			default:
 				return true;
@@ -113,6 +118,7 @@ int G_customizeentityforclient(edict_t *client, edict_t *ent, entity_state_t *st
 
 			trace_t trace;
 			trace = gi.trace(start, ent->mins, ent->maxs, end, ent, ent->clipmask ? ent->clipmask : MASK_SOLID);
+
 			VectorCopy(trace.endpos, state->origin);
 		}
 	}

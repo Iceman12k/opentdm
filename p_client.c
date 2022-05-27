@@ -2125,6 +2125,12 @@ void ClientBeginServerFrame (edict_t *ent)
 
 	client = ent->client;
 
+#ifdef ENHANCED_SERVER
+	client->xerp_amount = ((float)client->ping / 1000.0f);
+	if (client->xerp_amount > 0.18)
+		client->xerp_amount = 0.18;
+#endif
+
 	// run weapon animations if it hasn't been done by a ucmd_t, only run at 10hz since gun
 	// animations aren't designed for anything higher and it screws up reload times. the client
 	// does the work of interpolating the frame across multiple server frames.

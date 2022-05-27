@@ -274,6 +274,8 @@ void SV_CalcViewOffset (edict_t *ent)
 				ratio = 0;
 			angles[PITCH] += ratio * ent->client->fall_value;
 
+
+			/*
 			// add angles based on velocity
 
 			delta = DotProduct (ent->velocity, forward);
@@ -294,6 +296,7 @@ void SV_CalcViewOffset (edict_t *ent)
 			if (bobcycle & 1)
 				delta = -delta;
 			angles[ROLL] += delta;
+			*/
 
 			VectorCopy (ent->client->ps.kick_angles, ent->client->saved_angles);
 		}

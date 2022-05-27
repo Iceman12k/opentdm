@@ -1676,6 +1676,7 @@ struct gclient_s
 
 	usercmd_t      cmd_last;
 	int            dimension_observe;
+	float          xerp_amount;
 };
 
 typedef enum

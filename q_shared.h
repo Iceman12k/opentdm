@@ -369,6 +369,10 @@ typedef union
 #define VectorNegate(a,b)		(b[0]=-a[0],b[1]=-a[1],b[2]=-a[2])
 #define VectorSet(v, x, y, z)	(v[0]=(x), v[1]=(y), v[2]=(z))
 #define VectorAverage(a,b,o)	((o)[0]=((a)[0]+(b)[0])*0.5f,(o)[1]=((a)[1]+(b)[1])*0.5f,(o)[2]=((a)[2]+(b)[2])*0.5f)
+#define LerpVector(a,b,c,d) \
+    ((d)[0]=(a)[0]+(c)*((b)[0]-(a)[0]), \
+     (d)[1]=(a)[1]+(c)*((b)[1]-(a)[1]), \
+     (d)[2]=(a)[2]+(c)*((b)[2]-(a)[2]))
 
 //r1: macorize
 #define VectorCompare(v1,v2)	(v1[0]==v2[0] && v1[1]==v2[1] && v1[2]== v2[2])
