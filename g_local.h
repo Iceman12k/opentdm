@@ -913,6 +913,8 @@ void T_RadiusDamage(edict_t *inflictor, edict_t *attacker, float damage, edict_t
 
 // g_main.c
 void EndDMLevel(void);
+qboolean SV_CustomizeEntityToClient(edict_t *client, edict_t *ent, customize_entity_t *temp);
+qboolean SV_EntityVisibleToClient(edict_t *client, edict_t *ent);
 
 // damage flags
 #define DAMAGE_RADIUS              0x00000001  // damage was indirect
@@ -974,6 +976,9 @@ void player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
 // g_svcmds.c
 void ServerCommand(void);
 qboolean SV_FilterPacket(netadr_t *addr);
+
+// p_client.c
+void G_ClientPredraw(edict_t *clent, edict_t *ent, customize_entity_t *temp);
 
 // p_view.c
 void ClientEndServerFrame(edict_t *ent);
@@ -1599,6 +1604,9 @@ struct gclient_s {
 
     int            last_hud_update;
     int            next_hud_update;
+
+    // reki stuff
+    usercmd_t      cmd_last;
 };
 
 typedef enum {
@@ -1749,7 +1757,22 @@ struct edict_s {
 
     // hack for proper s.old_origin updates
     vec3_t      old_origin;
+
+    // reki
+    void        (*predraw)(edict_t *client, edict_t *ent, customize_entity_t *temp);
 };
+
+#define XERP_BASELINE (FRAMETIME * 0.5)
+#define XERP_MAX_XERPCLIENTS 0.04
+#define XERP_MAX_PROJECTILEXERP 0.12
+
+#ifndef max
+#define max(a,b) ((a)>(b)?(a):(b))
+#endif
+
+#ifndef min
+#define min(a,b) ((a)<(b)?(a):(b))
+#endif
 
 // R1Q2 and Q2PRO specific
 #define GMF_CLIENTNUM               BIT(0)      // game sets clientNum gclient_s field

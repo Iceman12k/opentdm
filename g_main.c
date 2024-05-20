@@ -24,6 +24,8 @@ game_locals_t game;
 level_locals_t level;
 game_import_t gi;
 game_export_t globals;
+game_import_ex_t gix;
+game_export_ex_t globalsx;
 spawn_temp_t st;
 
 int sm_meat_index;
@@ -217,6 +219,21 @@ DLL_EXPORT game_export_t* GetGameAPI(game_import_t *import) {
     return &globals;
 }
 
+/**
+ * Returns a pointer to the structure with all entry points and global
+ * variables
+ */
+DLL_EXPORT game_export_ex_t* GetGameAPIEx(game_import_ex_t *importx) {
+    gix = *importx;
+    
+    globalsx.apiversion = GAME_API_VERSION_EX;
+    globalsx.structsize = sizeof(game_export_ex_t);
+    globalsx.CustomizeEntityToClient = SV_CustomizeEntityToClient;
+    globalsx.EntityVisibleToClient = SV_EntityVisibleToClient;
+
+    return &globalsx;
+}
+
 #ifndef GAME_HARD_LINKED
 // this is only here so the functions in q_shared.c and q_shwin.c can link
 void Sys_Error(const char *error, ...) {
@@ -243,6 +260,69 @@ void Com_Printf(const char *msg, int level, ...) {
 }
 
 #endif
+
+static void G_XerpGeneric(edict_t *clent, edict_t *ent, customize_entity_t *temp)
+{
+    if (ent->movetype)
+    {
+        float xerp_amount = XERP_BASELINE;
+        if (ent->owner != clent) // don't ping xerp your own projectiles
+            xerp_amount += clent->client->ping / 1000.0; // lots of xerp for dodging
+        else
+            xerp_amount += min(clent->client->ping / 1000.0, XERP_MAX_XERPCLIENTS);
+        xerp_amount = min(xerp_amount, XERP_MAX_PROJECTILEXERP);
+
+        vec3_t start, end, velocity;
+        VectorCopy(temp->s.origin, start);
+        VectorCopy(ent->velocity, velocity);
+
+        switch (ent->movetype)
+        {
+        case MOVETYPE_BOUNCE:
+        //case MOVETYPE_TOSS:
+            xerp_amount = min(xerp_amount, 0.1);
+            velocity[2] -= ent->gravity * sv_gravity->value * xerp_amount;
+        case MOVETYPE_FLY:
+        case MOVETYPE_FLYMISSILE:
+            VectorMA(start, xerp_amount, velocity, end);
+            if (ent->owner == clent)
+                VectorMA(temp->s.old_origin, xerp_amount, velocity, temp->s.old_origin);
+            break;
+        default:
+            return false;
+        }
+
+        trace_t trace;
+        trace = gi.trace(start, ent->mins, ent->maxs, end, ent, ent->clipmask ? ent->clipmask : MASK_SOLID);
+        VectorCopy(trace.endpos, temp->s.origin);
+    }
+}
+
+qboolean SV_EntityVisibleToClient(edict_t *client, edict_t *ent)
+{
+    return true;
+}
+
+qboolean SV_CustomizeEntityToClient(edict_t *clent, edict_t *ent, customize_entity_t *temp)
+{
+    if (!ent->client && !ent->movetype)
+        return false;
+
+    // copy over base state
+    temp->s = ent->s;
+
+    // do predraw if requested
+    if (ent->predraw)
+    {
+        ent->predraw(clent, ent, temp);
+    }
+    else
+    {
+        G_XerpGeneric(clent, ent, temp);
+    }
+
+    return true;
+}
 
 /**
  *

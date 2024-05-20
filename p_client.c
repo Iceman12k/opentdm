@@ -1104,6 +1104,7 @@ void PutClientInServer(edict_t *ent) {
     ent->svflags = 0;
     ent->health = 100;
     ent->max_health = 100;
+    ent->predraw = G_ClientPredraw;
     VectorCopy(mins, ent->mins);
     VectorCopy(maxs, ent->maxs);
     VectorClear(ent->velocity);
@@ -1802,6 +1803,8 @@ void ClientThink(edict_t *ent, usercmd_t *ucmd) {
         }
 
         pm.cmd = *ucmd;
+        client->cmd_last = *ucmd;
+
         pm.trace = PM_trace;    // adds default parms
         pm.pointcontents = gi.pointcontents;
 
@@ -1999,3 +2002,42 @@ void ClientBeginServerFrame(edict_t *ent) {
 
     client->latched_buttons = 0;
 }
+
+// predraw stuff
+edict_t *xerp_ent;
+static trace_t PM_Xerp_Trace(const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end)
+{
+	return gi.trace(start, mins, maxs, end, xerp_ent, MASK_PLAYERSOLID);
+}
+
+void G_ClientPredraw(edict_t *clent, edict_t *ent, customize_entity_t *temp)
+{
+    if (!ent->client)
+        return;
+
+    float xerp_amount = XERP_BASELINE;
+    xerp_amount += min(clent->client->ping / 1000.0, XERP_MAX_XERPCLIENTS);
+
+    pmove_t pm;
+    xerp_ent = ent;
+    memcpy(&pm.s, &ent->client->ps.pmove, sizeof(pmove_state_t));
+
+    pm.trace = PM_Xerp_Trace;
+    pm.pointcontents = gi.pointcontents;
+    pm.s.pm_type = PM_NORMAL;
+
+    pm.cmd = ent->client->cmd_last; // just assume client is gonna keep pressing the same buttons for next frame
+    // we need to reign in A/D spamming at low velocities
+    if ((VectorLength(pm.s.velocity)/8) < 220)
+    {
+        pm.cmd.sidemove = 0;
+        pm.cmd.forwardmove = 0;
+    }
+
+    pm.cmd.msec = xerp_amount * 1000;
+
+    gi.Pmove(&pm);
+
+    VectorScale(pm.s.origin, 0.125, temp->s.origin);
+}
+
