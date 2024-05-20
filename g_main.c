@@ -579,5 +579,6 @@ void G_RunFrame(void) {
             }
         }
         level.framenum++;
+        level.time = level.framenum * FRAMETIME;
     }
 }

@@ -527,6 +527,7 @@ typedef struct {
     int             numspawns;
     edict_t         *spawns[TDM_MAX_MAP_SPAWNPOINTS];
     time_t          spawntime;
+    float           time;
 } level_locals_t;
 
 
@@ -989,6 +990,39 @@ void G_SetStats(edict_t *ent);
 void G_SetSpectatorStats(edict_t *ent);
 void ValidateSelectedItem(edict_t *ent);
 void DeathmatchScoreboard(edict_t *ent);
+
+// p_antilag.c
+#define ANTILAG_MAX			64
+#define ANTILAG_MASK		(ANTILAG_MAX - 1)
+#define ANTILAG_REWINDCAP	0.1
+
+#define XERP_BASELINE (FRAMETIME * 0.5)
+#define XERP_MAX_XERPCLIENTS 0.04
+#define XERP_MAX_PROJECTILEXERP 0.12
+
+extern cvar_t *sv_antilag;
+
+typedef struct antilag_s
+{
+	int		seek;
+	int		rewound;
+	float	curr_timestamp;
+
+	float	hist_timestamp[ANTILAG_MAX];
+	vec3_t	hist_origin[ANTILAG_MAX];
+	vec3_t	hist_mins[ANTILAG_MAX];
+	vec3_t	hist_maxs[ANTILAG_MAX];
+
+	vec3_t	hold_origin;
+	vec3_t	hold_mins;
+	vec3_t	hold_maxs;
+} antilag_t;
+
+void antilag_update(edict_t *ent);
+void antilag_rewind_all(edict_t *ent);
+void antilag_unmove(edict_t *who);
+void antilag_unmove_all(void);
+//
 
 // g_pweapon.c
 void PlayerNoise(edict_t *who, vec3_t where, int type);
@@ -1609,6 +1643,8 @@ struct gclient_s {
     int            next_hud_update;
 
     // reki stuff
+    antilag_t	   antilag_state;
+
     usercmd_t      cmd_last;
     vec3_t         origin_bob;
     vec3_t         angles_bob;
@@ -1776,9 +1812,18 @@ struct edict_s {
 #define BOBFLAG_GUN_ANGLE   0x04
 #define BOBFLAG_GUN_BOB     0x08
 
-#define XERP_BASELINE (FRAMETIME * 0.5)
-#define XERP_MAX_XERPCLIENTS 0.04
-#define XERP_MAX_PROJECTILEXERP 0.12
+#define LerpAngles(a,b,c,d) \
+    ((d)[0]=LerpAngle((a)[0],(b)[0],c), \
+    (d)[1]=LerpAngle((a)[1],(b)[1],c), \
+    (d)[2]=LerpAngle((a)[2],(b)[2],c))
+#define LerpVector(a,b,c,d) \
+    ((d)[0]=(a)[0]+(c)*((b)[0]-(a)[0]), \
+     (d)[1]=(a)[1]+(c)*((b)[1]-(a)[1]), \
+     (d)[2]=(a)[2]+(c)*((b)[2]-(a)[2]))
+#define LerpVector2(a,b,c,d,e) \
+    ((e)[0]=(a)[0]*(c)+(b)[0]*(d), \
+     (e)[1]=(a)[1]*(c)+(b)[1]*(d), \
+     (e)[2]=(a)[2]*(c)+(b)[2]*(d))
 
 #ifndef max
 #define max(a,b) ((a)>(b)?(a):(b))

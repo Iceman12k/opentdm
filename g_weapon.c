@@ -104,6 +104,7 @@ static void fire_lead(edict_t *self, vec3_t start, vec3_t aimdir, int damage,
     qboolean water = false;
     int content_mask = MASK_SHOT | MASK_WATER;
 
+    antilag_rewind_all(self);
     tr = gi.trace(self->s.origin, NULL, NULL, start, self, MASK_SHOT);
     if (!(tr.fraction < 1.0f)) {
         vectoangles(aimdir, dir);
@@ -170,6 +171,7 @@ static void fire_lead(edict_t *self, vec3_t start, vec3_t aimdir, int damage,
             tr = gi.trace(water_start, NULL, NULL, end, self, MASK_SHOT);
         }
     }
+    antilag_unmove_all();
 
     // send gun puff / flash
     if (!((tr.surface) && (tr.surface->flags & SURF_SKY))) {
@@ -623,6 +625,7 @@ void fire_rail(edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick)
     ignore = self;
     water = false;
     mask = MASK_SHOT | CONTENTS_SLIME | CONTENTS_LAVA;
+    antilag_rewind_all(self);
     while (ignore) {
         tr = gi.trace(from, NULL, NULL, end, ignore, mask);
 
@@ -638,6 +641,7 @@ void fire_rail(edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick)
             }
 
             if ((tr.ent != self) && (tr.ent->takedamage)) {
+                antilag_unmove(tr.ent);
                 T_Damage(tr.ent, self, self, aimdir, tr.endpos, tr.plane.normal,
                         damage, kick, 0, MOD_RAILGUN);
             }
@@ -645,6 +649,7 @@ void fire_rail(edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick)
 
         VectorCopy(tr.endpos, from);
     }
+    antilag_unmove_all();
 
     // send gun puff / flash
     gi.WriteByte(SVC_TEMP_ENTITY);

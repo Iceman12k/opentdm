@@ -352,6 +352,9 @@ void InitGame(void) {
     // ...
     sv_mvd_enable = gi.cvar("sv_mvd_enable", "", CVAR_LATCH);
 
+    // reki stuff
+    sv_antilag = gi.cvar("sv_antilag", "1", CVAR_SERVERINFO);
+
     InitItems();
 
     // initialize all entities for this game

@@ -1966,6 +1966,9 @@ void ClientBeginServerFrame(edict_t *ent) {
 
     client = ent->client;
 
+    if (sv_antilag->value) // if sv_antilag is enabled, we want to track our player position for later reference
+		antilag_update(ent);
+
     // run weapon animations if it hasn't been done by a ucmd_t, only run a
     // 10hz since gun animations aren't designed for anything higher and it
     // screws up reload times. the client does the work of interpolating the
