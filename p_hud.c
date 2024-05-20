@@ -497,12 +497,20 @@ void G_SetSpectatorStats(edict_t *ent) {
         if (cl->chase_mode == CHASE_EYES) {
             cl->ps.gunindex = cl->chase_target->client->ps.gunindex;
             cl->ps.gunframe = cl->chase_target->client->ps.gunframe;
-            VectorCopy(cl->chase_target->client->ps.gunangles,
-                    cl->ps.gunangles);
+
+            VectorClear(cl->ps.gunangles);
+            if (cl->pers.config.bob_flags & BOBFLAG_GUN_ANGLE)
+                VectorAdd(cl->ps.gunangles, cl->chase_target->client->gun_delta, cl->ps.gunangles);
+            if (cl->pers.config.bob_flags & BOBFLAG_GUN_BOB)
+                VectorAdd(cl->ps.gunangles, cl->chase_target->client->gun_bob, cl->ps.gunangles);
+
 
             //copy kickangles so hits/etc look realistic
-            VectorCopy(cl->chase_target->client->ps.kick_angles,
-                    cl->ps.kick_angles);
+            VectorCopy(cl->chase_target->client->angles_raw, cl->ps.kick_angles);
+            if (cl->pers.config.bob_flags & BOBFLAG_VIEW_ANGLES)
+                VectorAdd(cl->ps.kick_angles, cl->chase_target->client->angles_bob, cl->ps.kick_angles);
+
+            //VectorCopy(cl->chase_target->client->angles_raw, cl->ps.kick_origin);
         }
 
         //if our target player has the id stat up, we need to set configstrings for ourself.

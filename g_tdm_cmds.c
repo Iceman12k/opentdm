@@ -2795,7 +2795,7 @@ qboolean TDM_Command(const char *cmd, edict_t *ent) {
                 || !Q_stricmp(cmd, "notreadyteam")) {
             TDM_Changeteamstatus_f(ent, false);
         } else if (!Q_stricmp(cmd, "menu") || !Q_stricmp(cmd, "ctfmenu")
-                || !Q_stricmp(cmd, "inven")) {
+                || !Q_stricmp(cmd, "inven") || !Q_stricmp(cmd, "inventory")) {
             TDM_ShowTeamMenu(ent);
         } else if (!Q_stricmp(cmd, "commands")) {
             TDM_Commands_f(ent);

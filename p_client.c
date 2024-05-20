@@ -1514,6 +1514,13 @@ void ClientUserinfoChanged(edict_t *ent, char *userinfo) {
         }
     }
 
+    // reki stuff
+    ent->client->pers.config.bob_flags = BOBFLAG_GUN_BOB | BOBFLAG_VIEW_ORIGIN;
+    s = Info_ValueForKey(userinfo, "bobflags");
+    if (s[0]) {
+        ent->client->pers.config.bob_flags = atoi(s);
+    }
+
     // save off the userinfo in case we want to check something later
     Q_strncpy(ent->client->pers.userinfo, userinfo,
             sizeof(ent->client->pers.userinfo) - 1);

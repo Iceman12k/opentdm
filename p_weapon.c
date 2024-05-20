@@ -35,11 +35,17 @@ static void P_ProjectSource(gclient_t *client, vec3_t point, vec3_t distance,
     vec3_t _distance;
 
     VectorCopy(distance, _distance);
+    #if 0
     if (client->pers.hand == LEFT_HANDED) {
         _distance[1] *= -1;
     } else if (client->pers.hand == CENTER_HANDED) {
         _distance[1] = 0;
     }
+    #else
+    // disable handedness, always treat as center
+    _distance[2] += 8;
+    _distance[1] = 0;
+    #endif
     G_ProjectSource(point, _distance, forward, right, result);
 }
 
@@ -814,7 +820,7 @@ void Blaster_Fire(edict_t *ent, vec3_t g_offset, int damage, qboolean hyper,
     P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
 
     VectorScale(forward, -2, ent->client->kick_origin_final);
-    ent->client->kick_angles_final[0] = -1;
+    //ent->client->kick_angles_final[0] = -1;
     ent->client->kick_origin_start = 0;
     ent->client->kick_origin_end = 0.1f * SERVER_FPS;
 
@@ -878,9 +884,10 @@ void Weapon_HyperBlaster_Fire(edict_t *ent) {
             NoAmmoWeaponChange(ent);
         } else {
             rotation = (ent->client->ps.gunframe - 5) * 2 * M_PI / 6;
-            offset[0] = -4 * sin(rotation);
-            offset[1] = 0;
-            offset[2] = 4 * cos(rotation);
+            VectorClear(offset);
+            //offset[0] = -4 * sin(rotation);
+            //offset[1] = 0;
+            //offset[2] = 4 * cos(rotation);
 
             if ((ent->client->ps.gunframe == 6)
                     || (ent->client->ps.gunframe == 9)) {

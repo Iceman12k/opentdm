@@ -246,12 +246,13 @@ void SV_CalcViewOffset(edict_t *ent) {
             angles[PITCH] += ratio * ent->client->fall_value;
 
             // add angles based on velocity
+            VectorClear(ent->client->angles_bob);
 
             delta = DotProduct(ent->velocity, forward);
-            angles[PITCH] += delta * run_pitch->value;
+            ent->client->angles_bob[PITCH] += delta * run_pitch->value;
 
             delta = DotProduct(ent->velocity, right);
-            angles[ROLL] += delta * run_roll->value;
+            ent->client->angles_bob[ROLL] += delta * run_roll->value;
 
             // add angles based on bob
 
@@ -259,7 +260,7 @@ void SV_CalcViewOffset(edict_t *ent) {
             if (ent->client->ps.pmove.pm_flags & PMF_DUCKED) {
                 delta *= 6;     // crouching
             }
-            angles[PITCH] += delta;
+            ent->client->angles_bob[PITCH] += delta;
             delta = bobfracsin * bob_roll->value * xyspeed;
             if (ent->client->ps.pmove.pm_flags & PMF_DUCKED) {
                 delta *= 6;     // crouching
@@ -267,7 +268,11 @@ void SV_CalcViewOffset(edict_t *ent) {
             if (bobcycle & 1) {
                 delta = -delta;
             }
-            angles[ROLL] += delta;
+            ent->client->angles_bob[ROLL] += delta;
+            
+            VectorCopy(angles, ent->client->angles_raw);
+            if (ent->client->pers.config.bob_flags & BOBFLAG_VIEW_ANGLES)
+                VectorAdd(angles, ent->client->angles_bob, angles);
 
             VectorCopy(ent->client->ps.kick_angles, ent->client->saved_angles);
         } else
@@ -288,11 +293,16 @@ void SV_CalcViewOffset(edict_t *ent) {
     v[2] -= ratio * ent->client->fall_value * 0.4f;
 
     // add bob height
+    VectorClear(ent->client->origin_bob);
     bob = bobfracsin * xyspeed * bob_up->value;
     if (bob > 6) {
         bob = 6;
     }
-    v[2] += bob;
+    ent->client->origin_bob[2] += bob;
+    
+    VectorCopy(v, ent->client->origin_raw);
+    if (ent->client->pers.config.bob_flags & BOBFLAG_VIEW_ORIGIN)
+        VectorAdd(v, ent->client->origin_bob, v);
 
     // add kick offset
     VectorAdd(v, ent->client->kick_origin, v);
@@ -326,16 +336,17 @@ void SV_CalcGunOffset(edict_t *ent) {
     float delta;
 
     // gun angles from bobbing
-    ent->client->ps.gunangles[ROLL] = xyspeed * bobfracsin * 0.005f;
-    ent->client->ps.gunangles[YAW] = xyspeed * bobfracsin * 0.01f;
+    VectorClear(ent->client->gun_bob);
+    ent->client->gun_bob[ROLL] = xyspeed * bobfracsin * 0.005f;
+    ent->client->gun_bob[YAW] = xyspeed * bobfracsin * 0.01f;
     if (bobcycle & 1) {
-        ent->client->ps.gunangles[ROLL] = -ent->client->ps.gunangles[ROLL];
-        ent->client->ps.gunangles[YAW] = -ent->client->ps.gunangles[YAW];
+        ent->client->gun_bob[ROLL] = -ent->client->gun_bob[ROLL];
+        ent->client->gun_bob[YAW] = -ent->client->gun_bob[YAW];
     }
-
-    ent->client->ps.gunangles[PITCH] = xyspeed * bobfracsin * 0.005f;
+    ent->client->gun_bob[PITCH] = xyspeed * bobfracsin * 0.005f;
 
     // gun angles from delta movement
+    VectorClear(ent->client->gun_delta);
     for (i = 0; i < 3; i++) {
         delta = ent->client->oldviewangles[i] - ent->client->ps.viewangles[i];
         if (delta > 180) {
@@ -351,10 +362,17 @@ void SV_CalcGunOffset(edict_t *ent) {
             delta = -45;
         }
         if (i == YAW) {
-            ent->client->ps.gunangles[ROLL] += 0.1f * delta;
+            ent->client->gun_delta[ROLL] += 0.1f * delta;
         }
-        ent->client->ps.gunangles[i] += 0.2f * delta;
+        ent->client->gun_delta[i] += 0.2f * delta;
     }
+
+    // add these
+    VectorClear(ent->client->ps.gunangles);
+    if (ent->client->pers.config.bob_flags & BOBFLAG_GUN_ANGLE)
+        VectorAdd(ent->client->ps.gunangles, ent->client->gun_delta, ent->client->ps.gunangles);
+    if (ent->client->pers.config.bob_flags & BOBFLAG_GUN_BOB)
+        VectorAdd(ent->client->ps.gunangles, ent->client->gun_bob, ent->client->ps.gunangles);
 
     // gun height
     VectorClear(ent->client->ps.gunoffset);

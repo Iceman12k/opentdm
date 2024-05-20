@@ -1362,6 +1362,9 @@ typedef struct {
     int         weapon_timer;        // auto time weapon pickups
     int         weapon_mask;         // which weapons to time
     qboolean    loaded;
+
+    // reki stuff
+    int            bob_flags;
 } playerconfig_t;
 
 extern matchmode_t  tdm_match_status;
@@ -1607,6 +1610,12 @@ struct gclient_s {
 
     // reki stuff
     usercmd_t      cmd_last;
+    vec3_t         origin_bob;
+    vec3_t         angles_bob;
+    vec3_t         origin_raw;
+    vec3_t         angles_raw;
+    vec3_t         gun_delta;
+    vec3_t         gun_bob;
 };
 
 typedef enum {
@@ -1762,6 +1771,11 @@ struct edict_s {
     void        (*predraw)(edict_t *client, edict_t *ent, customize_entity_t *temp);
 };
 
+#define BOBFLAG_VIEW_ANGLES 0x01
+#define BOBFLAG_VIEW_ORIGIN 0x02
+#define BOBFLAG_GUN_ANGLE   0x04
+#define BOBFLAG_GUN_BOB     0x08
+
 #define XERP_BASELINE (FRAMETIME * 0.5)
 #define XERP_MAX_XERPCLIENTS 0.04
 #define XERP_MAX_PROJECTILEXERP 0.12
@@ -1785,5 +1799,5 @@ struct edict_s {
 #define GMF_VARIABLE_FPS            BIT(11)     // game supports variable server FPS
 #define GMF_EXTRA_USERINFO          BIT(12)     // game wants extra userinfo after normal userinfo
 #define GMF_IPV6_ADDRESS_AWARE      BIT(13)     // game supports IPv6 addresses
-#define GMF_ALLOW_INDEX_OVERFLOW    BIT(14)     // game wants PF_FindIndex() to return 0 on overflow
+#define GMF_ALLOW_INDEX_OVERFLOW    BIT(14)     // game wants PF_FindIndex() to return 0 on overflow`
 #define GMF_PROTOCOL_EXTENSIONS     BIT(15)     // game supports protocol extensions

@@ -746,6 +746,7 @@ typedef struct {
 // effects will be sent to the client even if it has a zero index model.
 #define EF_ROTATE           0x00000001      // rotate (bonus items)
 #define EF_GIB              0x00000002      // leave a trail
+#define EF_BOB              0x00000004      // used by KEX
 #define EF_BLASTER          0x00000008      // redlight + trail
 #define EF_ROCKET           0x00000010      // redlight + trail
 #define EF_GRENADE          0x00000020

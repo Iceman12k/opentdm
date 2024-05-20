@@ -261,8 +261,11 @@ void Com_Printf(const char *msg, int level, ...) {
 
 #endif
 
-static void G_XerpGeneric(edict_t *clent, edict_t *ent, customize_entity_t *temp)
+static void G_PredrawGeneric(edict_t *clent, edict_t *ent, customize_entity_t *temp)
 {
+    if (temp->s.effects & EF_ROTATE)
+        temp->s.effects |= EF_BOB;
+
     if (ent->movetype)
     {
         float xerp_amount = XERP_BASELINE;
@@ -278,18 +281,18 @@ static void G_XerpGeneric(edict_t *clent, edict_t *ent, customize_entity_t *temp
 
         switch (ent->movetype)
         {
-        case MOVETYPE_BOUNCE:
-        //case MOVETYPE_TOSS:
-            xerp_amount = min(xerp_amount, 0.1);
-            velocity[2] -= ent->gravity * sv_gravity->value * xerp_amount;
-        case MOVETYPE_FLY:
-        case MOVETYPE_FLYMISSILE:
-            VectorMA(start, xerp_amount, velocity, end);
-            if (ent->owner == clent)
-                VectorMA(temp->s.old_origin, xerp_amount, velocity, temp->s.old_origin);
-            break;
-        default:
-            return false;
+            case MOVETYPE_BOUNCE:
+            //case MOVETYPE_TOSS:
+                xerp_amount = min(xerp_amount, 0.1);
+                velocity[2] -= ent->gravity * sv_gravity->value * xerp_amount;
+            case MOVETYPE_FLY:
+            case MOVETYPE_FLYMISSILE:
+                VectorMA(start, xerp_amount, velocity, end);
+                if (ent->owner == clent)
+                    VectorMA(temp->s.old_origin, xerp_amount, velocity, temp->s.old_origin);
+                break;
+            default:
+                return;
         }
 
         trace_t trace;
@@ -318,7 +321,7 @@ qboolean SV_CustomizeEntityToClient(edict_t *clent, edict_t *ent, customize_enti
     }
     else
     {
-        G_XerpGeneric(clent, ent, temp);
+        G_PredrawGeneric(clent, ent, temp);
     }
 
     return true;
