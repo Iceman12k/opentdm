@@ -117,7 +117,7 @@ static const pmenu_t joinmenu[] =
     { NULL,                         PMENU_ALIGN_LEFT,   NULL, NULL },
     { NULL,                         PMENU_ALIGN_LEFT,   NULL, NULL },
     { "*Voting Menu",               PMENU_ALIGN_LEFT,   NULL, OpenVoteMenu },
-    { NULL,                         PMENU_ALIGN_LEFT,   NULL, NULL },
+    { "*Config Menu",               PMENU_ALIGN_LEFT,   NULL, OpenConfigMenu },
     { NULL,                         PMENU_ALIGN_LEFT,   NULL, NULL },
     { "Use [ and ] to move cursor", PMENU_ALIGN_CENTER, NULL, NULL },
     { "ENTER select, ESC exit",     PMENU_ALIGN_CENTER, NULL, NULL },

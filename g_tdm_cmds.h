@@ -69,3 +69,6 @@ void TDM_Unmute_f(edict_t *ent);
 qboolean TDM_ValidateModelSkin(const char *value);
 void TDM_WeaponTimer_f(edict_t *ent);
 void TDM_Win_f(edict_t *ent);
+
+// reki stuff
+void OpenConfigMenu(edict_t *ent);

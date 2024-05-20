@@ -263,6 +263,28 @@ void Com_Printf(const char *msg, int level, ...) {
 
 static void G_PredrawGeneric(edict_t *clent, edict_t *ent, customize_entity_t *temp)
 {
+    if (ent->item && 0) // simple item check
+    {
+        if (ent->item->simple_model)
+        {
+            temp->s.modelindex = gi.modelindex(ent->item->simple_model);
+
+            // move up a bit
+            temp->s.origin[2] += 8;
+            
+            // effects
+            temp->s.effects &= ~(EF_BOB | EF_ROTATE);
+            temp->s.renderfx = RF_FULLBRIGHT;
+
+            // fake billboard
+            VectorCopy(clent->client->ps.viewangles, temp->s.angles);
+            temp->s.angles[ROLL] = 0;
+            temp->s.angles[PITCH] *= -1;
+            temp->s.angles[YAW] += 180;
+            return;
+        }
+    }
+
     if (temp->s.effects & EF_ROTATE)
         temp->s.effects |= EF_BOB;
 

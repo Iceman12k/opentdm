@@ -2934,3 +2934,8 @@ qboolean TDM_Command(const char *cmd, edict_t *ent) {
 
     return true;
 }
+
+// based on OpenVoteMenu
+void OpenConfigMenu(edict_t *ent) {
+    
+}

@@ -429,6 +429,9 @@ typedef struct gitem_s {
     int         tag;
     const char  *precaches;     // string of all models, sounds, and images this item will use
     const char  *shortname;
+
+    // reki stuff
+    const char  *simple_model;
 } gitem_t;
 
 #define SMARTMAPFILE    "smartmap.cfg"

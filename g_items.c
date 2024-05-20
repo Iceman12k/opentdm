@@ -966,6 +966,9 @@ void PrecacheItem(const gitem_t *it) {
     if (it->icon) {
         gi.imageindex(it->icon);
     }
+    if (it->simple_model) { // Reki (May 20 2024): simple items
+        gi.modelindex(it->simple_model);
+    }
 
     // parse everything for its ammo
     if (it->ammoindex) {
@@ -1258,7 +1261,8 @@ gitem_t itemlist[] =
                         WEAP_ROCKETLAUNCHER,
                         NULL, 0,
                         /* precache */"models/objects/rocket/tris.md2 weapons/rockfly.wav weapons/rocklf1a.wav weapons/rocklr1b.wav models/objects/debris2/tris.md2",
-                        "RL", },
+                        "RL", 
+                        .simple_model = "models/sitems/rocket.md2"},
 
                 /*QUAKED weapon_hyperblaster (.3 .3 1) (-16 -16 -16) (16 16 16)
                  */
@@ -1272,7 +1276,8 @@ gitem_t itemlist[] =
                         WEAP_HYPERBLASTER,
                         NULL, 0,
                         /* precache */"models/objects/laser/tris.md2 weapons/hyprbu1a.wav weapons/hyprbl1a.wav weapons/hyprbf1a.wav weapons/hyprbd1a.wav misc/lasfly.wav",
-                        "HB", },
+                        "HB", 
+                        .simple_model = "models/sitems/hyperblaster.md2",},
 
                 /*QUAKED weapon_railgun (.3 .3 1) (-16 -16 -16) (16 16 16)
                  */
@@ -1348,7 +1353,8 @@ gitem_t itemlist[] =
                         IT_AMMO, 0,
                         NULL,
                         AMMO_CELLS,
-                        /* precache */"" },
+                        /* precache */"",
+                        .simple_model = "models/sitems/cells.md2",},
 
                 /*QUAKED ammo_rockets (.3 .3 1) (-16 -16 -16) (16 16 16)
                  */
@@ -1363,7 +1369,8 @@ gitem_t itemlist[] =
                         IT_AMMO, 0,
                         NULL,
                         AMMO_ROCKETS,
-                        /* precache */"" },
+                        /* precache */"",
+                        .simple_model = "models/sitems/rocket_ammo.md2"},
 
                 /*QUAKED ammo_slugs (.3 .3 1) (-16 -16 -16) (16 16 16)
                  */
