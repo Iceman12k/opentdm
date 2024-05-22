@@ -63,7 +63,7 @@ void antilag_rewind_all(edict_t *ent)
 	//if (ent->client->pers.antilag_optout)
 	//	return;
 
-	float png = (((float)ent->client->ping) / 1000) - XERP_MAX_XERPCLIENTS;
+	float png = max(0, (((float)ent->client->ping) / 1000) - XERP_MAX_XERPCLIENTS);
 	png = png + (FRAMETIME - XERP_BASELINE);
 
 	if (png < 0.0)

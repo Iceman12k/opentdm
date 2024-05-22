@@ -1755,6 +1755,8 @@ void ClientThink(edict_t *ent, usercmd_t *ucmd) {
     level.current_entity = ent;
     client = ent->client;
 
+    client->antilag_state.curr_timestamp += (float)ucmd->msec / 1000; // antilag needs sub-server-frame timestamps
+
     //no movement during map or match intermission
     if (tdm_match_status == MM_SCOREBOARD
             || (tdm_match_status == MM_TIMEOUT && ent->client->pers.team)) {
