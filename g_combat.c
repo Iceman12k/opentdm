@@ -434,14 +434,15 @@ void T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
  T_RadiusDamage
  ============
  */
-void T_RadiusDamage(edict_t *inflictor, edict_t *attacker, float damage,
+void T_RadiusDamage2(edict_t *inflictor, edict_t *attacker, float damage, float knock,
         edict_t *ignore, float radius, int mod) {
     float points;
     edict_t *ent = NULL;
     vec3_t v;
     vec3_t dir;
+    float dist;
 
-    while ((ent = findradius(ent, inflictor->s.origin, radius)) != NULL) {
+    while ((ent = findradius(ent, inflictor->s.origin, radius + 16)) != NULL) {
         if (ent == ignore) {
             continue;
         }
@@ -449,6 +450,37 @@ void T_RadiusDamage(edict_t *inflictor, edict_t *attacker, float damage,
             continue;
         }
 
+        // Reki (May 21 2024): fgsfds...
+        #if 1
+        float rad = (max(ent->maxs[1] - ent->mins[1], ent->maxs[0] - ent->mins[0]) / 2);
+        rad = min(rad, ent->maxs[2] - ent->mins[2]); // flat fucks are a problem...
+        
+        // build the capsule
+        VectorAdd(ent->mins, ent->maxs, v);
+        VectorMA(ent->s.origin, 0.5f, v, v);
+        v[2] = bound(ent->absmin[2] + rad, inflictor->s.origin[2], ent->absmax[2] - rad);
+        VectorSubtract(v, inflictor->s.origin, dir);
+        dist = VectorNormalize(dir);
+
+        // set 'v' to the knockback vec, since we don't want to use our capsule position for knockback
+        VectorSubtract(ent->s.origin, inflictor->s.origin, v);
+        
+        // find damage
+        float frac = 1 - bound(0, (dist - rad) / radius, 1);
+        points = damage * frac;
+        if (ent == attacker)
+            points *= 0.5;
+
+        if (points > 0)
+        {
+            if (CanDamage(ent, inflictor))
+            {
+                T_Damage(ent, inflictor, attacker, v, inflictor->s.origin,
+                    vec3_origin, (int)points, (int)(knock * frac), DAMAGE_RADIUS,
+                    mod);
+            }
+        }
+        #else
         VectorAdd(ent->mins, ent->maxs, v);
         VectorMA(ent->s.origin, 0.5f, v, v);
         VectorSubtract(inflictor->s.origin, v, v);
@@ -464,5 +496,11 @@ void T_RadiusDamage(edict_t *inflictor, edict_t *attacker, float damage,
                         mod);
             }
         }
+        #endif
     }
+}
+
+void T_RadiusDamage(edict_t *inflictor, edict_t *attacker, float damage,
+        edict_t *ignore, float radius, int mod) {
+    T_RadiusDamage2(inflictor, attacker, damage, damage * 0.5, ignore, radius, mod);
 }

@@ -914,6 +914,7 @@ void T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
         vec3_t point, vec3_t normal, int damage, int knockback, int dflags,
         int mod);
 void T_RadiusDamage(edict_t *inflictor, edict_t *attacker, float damage, edict_t *ignore, float radius, int mod);
+void T_RadiusDamage2(edict_t *inflictor, edict_t *attacker, float damage, float knock, edict_t *ignore, float radius, int mod);
 
 // g_main.c
 void EndDMLevel(void);
@@ -1827,6 +1828,9 @@ struct edict_s {
     ((e)[0]=(a)[0]*(c)+(b)[0]*(d), \
      (e)[1]=(a)[1]*(c)+(b)[1]*(d), \
      (e)[2]=(a)[2]*(c)+(b)[2]*(d))
+
+#define clamp(a,b,c) (a = (a <= c) ? ((a >= b) ? (a) : (b)) : (c))
+#define bound(a,b,c) ((a) >= (c) ? (a) : (b) < (a) ? (a) : (b) > (c) ? (c) : (b))
 
 #ifndef max
 #define max(a,b) ((a)>(b)?(a):(b))
