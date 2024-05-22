@@ -424,7 +424,7 @@ void T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
         client->damage_parmor += psave;
         client->damage_armor += asave;
         client->damage_blood += take;
-        client->damage_knockback += knockback;
+        client->damage_knockback += knockback * 0.33;
         VectorCopy(point, client->damage_from);
     }
 }
