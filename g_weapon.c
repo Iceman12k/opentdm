@@ -553,8 +553,18 @@ void rocket_touch(edict_t *ent, edict_t *other, cplane_t *plane,
     TDM_BeginDamage();
 
     if (other->takedamage) {
-        T_Damage(other, ent, ent->owner, ent->velocity, ent->s.origin,
-                plane->normal, ent->dmg, 0, 0, MOD_ROCKET);
+        vec3_t knock_norm;
+        LerpVector(other->absmin, other->absmax, 0.5, knock_norm);
+        VectorSubtract(knock_norm, ent->s.origin, knock_norm);
+        VectorNormalize(knock_norm);
+        
+        if (other->client)
+        {
+            other->client->ps.pmove.pm_flags &= ~PMF_ON_GROUND;
+        }
+
+        T_Damage(other, ent, ent->owner, knock_norm, ent->s.origin,
+                plane->normal, ent->dmg, 210, 0, MOD_ROCKET);
     }
 
     T_RadiusDamage(ent, ent->owner, ent->radius_dmg, other, ent->dmg_radius,
