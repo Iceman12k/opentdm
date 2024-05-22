@@ -1294,7 +1294,7 @@ void weapon_railgun_fire(edict_t *ent) {
 
     // normal damage is too extreme in dm
     damage = 100;
-    kick = 200;
+    kick = 225;
 
     // more rail damage in insta == no dead bodies
     if ((int) g_gamemode->value == GAMEMODE_ITDM) {
