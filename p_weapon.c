@@ -951,7 +951,7 @@ void Machinegun_Fire(edict_t *ent) {
     vec3_t forward, right;
     vec3_t angles;
     int damage = 8;
-    int kick = 2;
+    int kick = 28;
     vec3_t offset;
 
     if (!(ent->client->buttons & BUTTON_ATTACK)) {
