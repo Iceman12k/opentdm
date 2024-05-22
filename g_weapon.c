@@ -280,7 +280,7 @@ void blaster_touch(edict_t *self, edict_t *other, cplane_t *plane,
         }
         TDM_BeginDamage();
         T_Damage(other, self, self->owner, self->velocity, self->s.origin,
-                plane->normal, self->dmg, 1, DAMAGE_ENERGY, mod);
+                plane->normal, self->dmg, 45, DAMAGE_ENERGY, mod);
         TDM_EndDamage();
     } else {
         gi.WriteByte(SVC_TEMP_ENTITY);
