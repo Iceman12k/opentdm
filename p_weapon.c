@@ -758,6 +758,7 @@ void Weapon_RocketLauncher_Fire(edict_t *ent) {
     damage_radius = 120;
     damage = 110;// + (int) (random() * 20.0f);
     radius_damage = 110;
+    damage_radius = 140;
 
     if (is_quad == ent) {
         damage *= 4;
