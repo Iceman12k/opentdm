@@ -997,8 +997,8 @@ void Machinegun_Fire(edict_t *ent) {
     AngleVectors(angles, forward, right, NULL);
     VectorSet(offset, 0, 8, ent->viewheight - 8);
     P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
-    fire_bullet(ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD,
-            DEFAULT_BULLET_VSPREAD, MOD_MACHINEGUN);
+    fire_bullet(ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD * 0.5,
+            DEFAULT_BULLET_VSPREAD * 0.5, MOD_MACHINEGUN);
     TDM_WeaponFired(ent);
 
     gi.WriteByte(SVC_MUZZLEFLASH);
