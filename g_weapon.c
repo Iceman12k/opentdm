@@ -651,7 +651,8 @@ void fire_rail(edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick)
             }
 
             if ((tr.ent != self) && (tr.ent->takedamage)) {
-                antilag_unmove(tr.ent);
+                if (tr.ent->client)
+                    antilag_unmove(tr.ent); // unmove this ent to deal damage
                 T_Damage(tr.ent, self, self, aimdir, tr.endpos, tr.plane.normal,
                         damage, kick, 0, MOD_RAILGUN);
             }
