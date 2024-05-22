@@ -755,7 +755,6 @@ void Weapon_RocketLauncher_Fire(edict_t *ent) {
     float damage_radius;
     int radius_damage;
 
-    damage_radius = 120;
     damage = 110;// + (int) (random() * 20.0f);
     radius_damage = 110;
     damage_radius = 140;
@@ -1042,9 +1041,8 @@ void Chaingun_Fire(edict_t *ent) {
     float r, u;
     vec3_t offset;
     int damage;
-    int kick = 2;
-
-    damage = 6;
+    int kick = 19;
+    damage = 5;
 
     if (ent->client->ps.gunframe == 5) {
         gi.sound(ent, CHAN_AUTO, gi.soundindex("weapons/chngnu1a.wav"), 1,
