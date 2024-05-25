@@ -998,10 +998,10 @@ void DeathmatchScoreboard(edict_t *ent);
 // p_antilag.c
 #define ANTILAG_MAX			64
 #define ANTILAG_MASK		(ANTILAG_MAX - 1)
-#define ANTILAG_REWINDCAP	0.1
+#define ANTILAG_REWINDCAP	0.12
 
-#define XERP_BASELINE (FRAMETIME * 0.5)
-#define XERP_MAX_XERPCLIENTS 0.03
+#define XERP_BASELINE (FRAMETIME * 0.4)
+#define XERP_MAX_XERPCLIENTS 0.04
 #define XERP_MAX_PROJECTILEXERP 0.12
 
 extern cvar_t *sv_antilag;
