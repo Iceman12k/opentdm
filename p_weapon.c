@@ -43,7 +43,6 @@ static void P_ProjectSource(gclient_t *client, vec3_t point, vec3_t distance,
     }
     #else
     // disable handedness, always treat as center
-    _distance[2] += 8;
     _distance[1] = 0;
     #endif
     G_ProjectSource(point, _distance, forward, right, result);
